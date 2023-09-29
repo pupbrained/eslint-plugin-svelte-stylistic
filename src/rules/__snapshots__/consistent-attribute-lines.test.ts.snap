@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`consistent-attribute-lines > invalid > <div 
+  baz foo bar="2">Text</div> 1`] = `
+"<div 
+  baz
+foo
+bar=\\"2\\">Text</div>"
+`;
+
+exports[`consistent-attribute-lines > invalid > <div baz
+  foo 
+  bar="2">Text</div> 1`] = `"<div baz foo bar=\\"2\\">Text</div>"`;
+
+exports[`consistent-attribute-lines > invalid > <div baz foo 
+  bar="2">Text</div> 1`] = `"<div baz foo bar=\\"2\\">Text</div>"`;
+
+exports[`consistent-attribute-lines > invalid > <div foo
+  bar /> 1`] = `"<div foo bar />"`;

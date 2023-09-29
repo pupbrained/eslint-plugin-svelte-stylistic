@@ -1,0 +1,30 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`brackets-same-line > invalid > <div
+  >
+  Text</div> 1`] = `
+"<div>
+  Text</div>"
+`;
+
+exports[`brackets-same-line > invalid > <div
+  >Text</div> 1`] = `"<div>Text</div>"`;
+
+exports[`brackets-same-line > invalid > <div 
+    title="foo"
+    >Text</div> 1`] = `
+"<div 
+    title=\\"foo\\">Text</div>"
+`;
+
+exports[`brackets-same-line > invalid > <div 
+    title="foo"
+    class="foo"
+    >Text</div> 1`] = `
+"<div 
+    title=\\"foo\\"
+    class=\\"foo\\">Text</div>"
+`;
+
+exports[`brackets-same-line > invalid > <div 
+  /> 1`] = `"<div/>"`;
