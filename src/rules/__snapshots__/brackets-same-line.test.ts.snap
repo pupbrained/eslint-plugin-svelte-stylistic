@@ -28,3 +28,6 @@ exports[`brackets-same-line > invalid > <div
 
 exports[`brackets-same-line > invalid > <div 
   /> 1`] = `"<div/>"`;
+
+exports[`brackets-same-line > invalid > <div>Text</div
+  > 1`] = `"<div>Text</div>"`;

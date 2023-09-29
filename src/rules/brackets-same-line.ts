@@ -46,6 +46,28 @@ export default createEslintRule<Options, MessageIds>({
             },
           })
         }
+
+        if (!node.endTag)
+          return
+
+        const endBracketOrphaned = node.endTag.loc.start.line !== node.endTag.loc.end.line
+        if (endBracketOrphaned) {
+          context.report({
+            // @ts-expect-error - type conversion from SvelteAttribute to node not handled
+            node: node.endTag,
+            loc: {
+              start: node.endTag.loc.start,
+              end: node.endTag.loc.end,
+            },
+            messageId: 'bracketOnNextLine',
+            *fix(fixer) {
+              const from = node.endTag!.range[0]
+              const to = node.endTag!.range[1]
+              const code = context.getSourceCode().text.slice(from, to)
+              yield fixer.replaceTextRange([from, to], code.replace(/\s+/g, ''))
+            },
+          })
+        }
       },
     }
   },

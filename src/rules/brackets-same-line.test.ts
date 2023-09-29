@@ -35,6 +35,9 @@ const invalids = [
   >
   Text</div>`,
 
+  `<div>Text</div
+  >`,
+
   `<div 
   />`,
 ]
