@@ -1,9 +1,9 @@
-import type { AST } from 'svelte-eslint-parser'
-import { createEslintRule } from '../utils'
+import type { AST } from 'svelte-eslint-parser';
+import { createEslintRule } from '../utils';
 
-export const RULE_NAME = 'brackets-same-line'
-export type MessageIds = 'bracketOnNextLine'
-export type Options = []
+export const RULE_NAME = 'brackets-same-line';
+export type MessageIds = 'bracketOnSameLine';
+export type Options = [];
 
 export default createEslintRule<Options, MessageIds>({
   name: RULE_NAME,
@@ -15,7 +15,7 @@ export default createEslintRule<Options, MessageIds>({
     },
     schema: [],
     messages: {
-      bracketOnNextLine: 'Closing bracket is separated from tag and attributes',
+      bracketOnSameLine: 'Closing bracket should be on the same line as the last attribute or the tag itself',
     },
     fixable: 'whitespace',
   },
@@ -23,13 +23,14 @@ export default createEslintRule<Options, MessageIds>({
   create: (context) => {
     return {
       SvelteElement(node: AST.SvelteElement) {
-        const startLine = node.loc.start.line
-        const lastAttr = node.startTag.attributes[node.startTag.attributes.length - 1]
-        const lastAttrLine = lastAttr?.loc.end.line ?? -1
-        const lastLine = Math.max(startLine, lastAttrLine)
-        const endOfStartTag = node.startTag.loc.end.line
-        const bracketIsOrphaned = lastLine < endOfStartTag
-        if (bracketIsOrphaned) {
+        const startLine = node.loc.start.line;
+        const lastAttr = node.startTag.attributes[node.startTag.attributes.length - 1];
+        const lastAttrLine = lastAttr?.loc.end.line ?? -1;
+        const lastLine = Math.max(startLine, lastAttrLine);
+        const endOfStartTag = node.startTag.loc.end.line;
+        const bracketIsOnSameLine = lastLine === endOfStartTag;
+        
+        if (!bracketIsOnSameLine) {
           context.report({
             // @ts-expect-error - type conversion from SvelteAttribute to node not handled
             node: lastAttr || node.startTag,
@@ -37,21 +38,20 @@ export default createEslintRule<Options, MessageIds>({
               start: lastAttr?.loc.end || node.startTag.loc.start,
               end: node.startTag.loc.end,
             },
-            messageId: 'bracketOnNextLine',
+            messageId: 'bracketOnSameLine',
             *fix(fixer) {
-              const from = lastAttr?.range[1] ?? node.startTag.range[0]
-              const to = node.startTag.range[1]
-              const code = context.getSourceCode().text.slice(from, to)
-              yield fixer.replaceTextRange([from, to], code.replace(/\s+/g, ''))
+              const from = lastAttr?.range[1] ?? node.startTag.range[0];
+              const to = node.startTag.range[1];
+              const code = context.getSourceCode().text.slice(from, to);
+              yield fixer.replaceTextRange([from, to], code.replace(/\s+/g, ''));
             },
-          })
+          });
         }
 
-        if (!node.endTag)
-          return
+        if (!node.endTag) return;
 
-        const endBracketOrphaned = node.endTag.loc.start.line !== node.endTag.loc.end.line
-        if (endBracketOrphaned) {
+        const endBracketIsOnSameLine = node.endTag.loc.start.line === node.endTag.loc.end.line;
+        if (!endBracketIsOnSameLine) {
           context.report({
             // @ts-expect-error - type conversion from SvelteAttribute to node not handled
             node: node.endTag,
@@ -59,16 +59,16 @@ export default createEslintRule<Options, MessageIds>({
               start: node.endTag.loc.start,
               end: node.endTag.loc.end,
             },
-            messageId: 'bracketOnNextLine',
+            messageId: 'bracketOnSameLine',
             *fix(fixer) {
-              const from = node.endTag!.range[0]
-              const to = node.endTag!.range[1]
-              const code = context.getSourceCode().text.slice(from, to)
-              yield fixer.replaceTextRange([from, to], code.replace(/\s+/g, ''))
+              const from = node.endTag!.range[0];
+              const to = node.endTag!.range[1];
+              const code = context.getSourceCode().text.slice(from, to);
+              yield fixer.replaceTextRange([from, to], code.replace(/\s+/g, ''));
             },
-          })
+          });
         }
       },
-    }
+    };
   },
-})
+});
